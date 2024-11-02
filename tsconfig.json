@@ -1,0 +1,25 @@
+{
+  "include": ["./**/*.d.ts", "./**/*.ts", "./**/*.tsx"],
+  "exclude": ["node_modules", "dist", "playwright.config.ts"],
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "module": "ES2022",
+    "target": "ES2022",
+    "strict": true,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "types": ["@shopify/oxygen-workers-types"],
+    "paths": {
+      "~/*": ["app/*"],
+      "@/*": ["app/*"]
+    },
+    "noEmit": true
+  }
+}

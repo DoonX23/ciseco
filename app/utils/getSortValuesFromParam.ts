@@ -1,0 +1,43 @@
+import type {
+  ProductCollectionSortKeys,
+  SearchSortKeys,
+} from '@shopify/hydrogen/storefront-api-types';
+import type {SortParam} from '~/components/SortMenu';
+
+export function getSortValuesFromParam(sortParam: SortParam | null): {
+  sortKey: ProductCollectionSortKeys | SearchSortKeys;
+  reverse: boolean;
+} {
+  switch (sortParam) {
+    case 'price-high-low':
+      return {
+        sortKey: 'PRICE',
+        reverse: true,
+      };
+    case 'price-low-high':
+      return {
+        sortKey: 'PRICE',
+        reverse: false,
+      };
+    case 'best-selling':
+      return {
+        sortKey: 'BEST_SELLING',
+        reverse: false,
+      };
+    case 'newest':
+      return {
+        sortKey: 'CREATED',
+        reverse: true,
+      };
+    case 'featured':
+      return {
+        sortKey: 'MANUAL',
+        reverse: false,
+      };
+    default:
+      return {
+        sortKey: 'RELEVANCE',
+        reverse: false,
+      };
+  }
+}
