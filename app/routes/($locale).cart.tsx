@@ -184,7 +184,7 @@ function Content({cart: originalCart}: {cart: CartReturn | null}) {
 }
 
 function CartLineItem({line}: {line: OptimisticCartLine}) {
-  const {id, quantity, merchandise, isOptimistic} = line;
+  const {id, quantity, merchandise, isOptimistic, attributes} = line;
 
   const lineItemUrl = useVariantUrl(
     merchandise?.product?.handle || '',
@@ -245,6 +245,21 @@ function CartLineItem({line}: {line: OptimisticCartLine}) {
                   ? null
                   : merchandise.title}
               </div>
+
+              {/* Add Attributes Display */}
+              {attributes && attributes.length > 0 && (
+                <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                  {attributes.map((attr) => (
+                    <div 
+                      key={attr.key}
+                      className="flex items-center gap-x-2"
+                    >
+                      <span className="font-medium">{attr.key}:</span>
+                      <span>{attr.value}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div className="mt-3 flex justify-between w-full sm:hidden relative">
                 <CartLineQuantityAdjust line={line} />
