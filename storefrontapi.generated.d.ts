@@ -1105,6 +1105,36 @@ export type ProductQuery = {
       collections: {
         nodes: Array<Pick<StorefrontAPI.Collection, 'id' | 'title' | 'handle'>>;
       };
+      customizable_size?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Metafield, 'id' | 'value' | 'namespace' | 'key'>
+    >;
+    form_type?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Metafield, 'id' | 'value' | 'namespace' | 'key'>
+    >;
+    material?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Metafield, 'id' | 'value' | 'namespace' | 'key'>
+    >;
+    opacity?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Metafield, 'id' | 'value' | 'namespace' | 'key'>
+    >;
+    color?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Metafield, 'id' | 'value' | 'namespace' | 'key'>
+    >;
+    thickness?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Metafield, 'id' | 'value' | 'namespace' | 'key'>
+    >;
+    diameter?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Metafield, 'id' | 'value' | 'namespace' | 'key'>
+    >;
+    machining_precision?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Metafield, 'id' | 'value' | 'namespace' | 'key'>
+    >;
+    density?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Metafield, 'id' | 'value' | 'namespace' | 'key'>
+    >;
+    unit_price?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Metafield, 'id' | 'value' | 'namespace' | 'key'>
+    >;
       reviews_rating_count?: StorefrontAPI.Maybe<
         Pick<StorefrontAPI.Metafield, 'id' | 'value' | 'namespace' | 'key'>
       >;
