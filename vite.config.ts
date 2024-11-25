@@ -1,7 +1,7 @@
 import {defineConfig} from 'vite';
 import {hydrogen} from '@shopify/hydrogen/vite';
 import {oxygen} from '@shopify/mini-oxygen/vite';
-import { vitePlugin as remix } from '@remix-run/dev';
+import {vitePlugin as remix} from '@remix-run/dev';
 // @ts-ignore
 import tsconfigPaths from 'vite-tsconfig-paths';
 
@@ -21,7 +21,16 @@ export default defineConfig({
   ],
   ssr: {
     optimizeDeps: {
-      include: ['typographic-base'],
+      include: [
+        'tiny-emitter',
+        'seedrandom',
+        'escape-latex',
+        'javascript-natural-sort',
+        'convert-units',
+        'use-sync-external-store/shim/with-selector.js',
+        'lodash.get',
+        'typographic-base',
+      ],
     },
   },
   optimizeDeps: {
