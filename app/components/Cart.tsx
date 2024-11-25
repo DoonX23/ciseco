@@ -155,7 +155,7 @@ function CartSummary({
 }
 
 function CartLineItem({line}: {line: OptimisticCartLine}) {
-  const {id, quantity, merchandise, isOptimistic} = line;
+  const {id, quantity, merchandise, isOptimistic, attributes} = line;
   const {product, title, image, selectedOptions} = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
   const {close: closeCartAside} = useAside();
@@ -229,6 +229,19 @@ function CartLineItem({line}: {line: OptimisticCartLine}) {
                   })
                 : merchandise.title || ''}
             </div>
+                    {/* Add attributes display */}
+        {attributes && attributes.length > 0 && (
+          <div className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            {attributes.map((attr) => (
+              <div 
+                key={attr.key}
+                className="capitalize"
+              >
+                {attr.key}: {attr.value}
+              </div>
+            ))}
+          </div>
+        )}
           </div>
           <CartLinePrice line={line} className="mt-0.5" />
         </div>
