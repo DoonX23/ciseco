@@ -52,7 +52,7 @@ import {getLoaderRouteFromMetaobject} from '~/utils/getLoaderRouteFromMetaobject
 import type {RootLoader} from '~/root';
 import {useAside} from '~/components/Aside';
 import {SlashIcon} from '@heroicons/react/24/solid';
-
+import {CustomProductForm} from '~/components/CustomProductForm';
 export const headers = routeHeaders;
 
 export async function loader(args: LoaderFunctionArgs) {
@@ -234,9 +234,13 @@ export default function Product() {
                   resolve={variants}
                 >
                   {(resp) => (
-                    <ProductForm
-                      variants={resp.product?.variants.nodes || []}
-                    />
+                  <>
+                  {product.customizable_size?.value === "true" ? ( // 添加严格相等判断和字符串比较
+                    <CustomProductForm product={product}/>
+                  ) : (
+                    <ProductForm variants={resp.product?.variants.nodes || []} />
+                  )}
+                </>
                   )}
                 </Await>
               </Suspense>
@@ -733,6 +737,66 @@ export const PRODUCT_QUERY = `#graphql
           title
           handle
         }
+      }
+      customizable_size: metafield(namespace: "custom", key:"customizable_size") {
+        id
+        value
+        namespace
+        key
+      }
+      form_type: metafield(namespace: "custom", key:"form_type") {
+        id
+        value
+        namespace
+        key
+      }
+      material: metafield(namespace: "custom", key:"material") {
+        id
+        value
+        namespace
+        key
+      }
+      opacity: metafield(namespace: "custom", key:"opacity") {
+        id
+        value
+        namespace
+        key
+      }
+      color: metafield(namespace: "custom", key:"color") {
+        id
+        value
+        namespace
+        key
+      }
+      thickness: metafield(namespace: "custom", key:"thickness") {
+        id
+        value
+        namespace
+        key
+      }
+      diameter: metafield(namespace: "custom", key:"diameter") {
+        id
+        value
+        namespace
+        key
+      }
+      machining_precision: metafield(namespace: "custom", key:"machining_precision") {
+        id
+        value
+        namespace
+        key
+      }
+      density: metafield(namespace: "custom", key:"density") {
+        id
+        value
+        namespace
+        key
+      }
+      unit_price: metafield(namespace: "custom", key:"unit_price") {
+        id
+        value
+        namespace
+        key
       }
       reviews_rating_count: metafield(namespace: "reviews", key:"rating_count") {
         id
