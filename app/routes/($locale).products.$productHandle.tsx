@@ -53,6 +53,9 @@ import type {RootLoader} from '~/root';
 import {useAside} from '~/components/Aside';
 import {SlashIcon} from '@heroicons/react/24/solid';
 import {CustomProductForm} from '~/components/CustomProductForm';
+import {liteClient} from 'algoliasearch/lite';
+import {createFetchRequester} from '@algolia/requester-fetch';
+
 export const headers = routeHeaders;
 
 export async function loader(args: LoaderFunctionArgs) {
@@ -148,6 +151,11 @@ function loadDeferredData(args: LoaderFunctionArgs) {
   const {productHandle} = params;
   invariant(productHandle, 'Missing productHandle param, check route filename');
 
+ const client = liteClient(context.env.ALGOLIA_APP_ID,context.env.ALGOLIA_API_KEY, {
+    requester: createFetchRequester()  // 使用fetch requester
+  }
+);
+
   // In order to show which variants are available in the UI, we need to query
   // all of them. But there might be a *lot*, so instead separate the variants
   // into it's own separate query that is deferred. So there's a brief moment
@@ -169,10 +177,99 @@ function loadDeferredData(args: LoaderFunctionArgs) {
     handle: 'route-product',
   });
 
+  // 修改: 将collection查询结果存储为Promise
+  const collectionQueryPromise = context.storefront.query(Collection_Handle_QUERY, {
+    variables: {
+      handle: productHandle,
+      country: context.storefront.i18n.country,
+      language: context.storefront.i18n.language,
+    },
+  });
+  // 处理collection数据的Promise
+const collectionDataPromise = collectionQueryPromise.then(({product}) => {
+  const productMetafields = product?.collections?.edges[0]?.node?.products?.nodes || [];
   return {
-    variants,
-    routePromise,
+    collectionHandle: product?.collections?.nodes[0]?.handle,
+    productMetafields
   };
+});
+
+// facets处理逻辑，同时处理productMetafields的过滤
+const facetsPromise = collectionDataPromise.then(async ({collectionHandle, productMetafields}) => {
+  if(!collectionHandle) {
+    return {
+      facets: null,
+      filteredMetafields: []
+    };
+  }
+  const facetsResponse = await client.searchForFacets({
+    requests: [{
+      indexName: 'shopify_doonx_products',
+      params: new URLSearchParams({
+        query: '',
+        facets: JSON.stringify([
+          'meta.custom.color',
+          'meta.custom.material',
+          'meta.custom.diameter', 
+          'meta.custom.opacity',
+          'meta.custom.thickness'
+        ]),
+        facetFilters: JSON.stringify([
+          `collections:${collectionHandle}`
+        ]),
+        attributesToRetrieve: JSON.stringify(['title', 'handle', 'meta']),
+        maxValuesPerFacet: '100',
+        hitsPerPage: '0'
+      }).toString()
+    }]
+  });
+
+  const firstResult = (facetsResponse.results[0] as unknown) as { facets: Record<string, Record<string, number>> };
+  const transformedFacets = transformFacets(firstResult.facets);
+  // 获取facets中的名称（转为小写以便比较）
+  const facetNames = transformedFacets.map(facet => facet.name.toLowerCase());
+  // 过滤productMetafields
+  const filteredMetafields = productMetafields.map(product => ({
+    metafields: product.metafields
+      .filter(metafield => metafield != null)
+      .filter(metafield => facetNames.includes(metafield.key)),
+    handle: product.handle
+  }));
+
+  return {
+    facets: transformedFacets,
+    filteredMetafields
+  };
+});
+
+return {
+  variants,
+  routePromise,
+  // 只返回一个包含两个数据的Promise
+  facetsDataPromise: facetsPromise.then(result => ({
+    facets: result.facets,
+    productMetafields: result.filteredMetafields
+  }))
+};
+}
+
+function transformFacets(facetsObj: Record<string, Record<string, number>>) {
+  // 1. 先进行转换
+  const transformed = Object.entries(facetsObj).map(([name, values]) => {
+    const attributeName = name.split('.').pop() || '';
+    const capitalizedName = attributeName.charAt(0).toUpperCase() + attributeName.slice(1);
+    const optionValues = Object.keys(values).map(value => ({
+      name: value
+    }));
+
+    return {
+      name: capitalizedName,
+      optionValues: optionValues
+    };
+  });
+
+  // 2. 过滤掉只有一个选项的facet
+  return transformed.filter(facet => facet.optionValues.length > 1);
 }
 
 export function redirectToFirstVariant({
@@ -200,7 +297,7 @@ export const meta = ({matches}: MetaArgs<typeof loader>) => {
 };
 
 export default function Product() {
-  const {product, shop, recommended, variants, routePromise} =
+  const {product, shop, recommended, variants, routePromise, facetsDataPromise } =
     useLoaderData<typeof loader>();
   const {media, outstanding_features, descriptionHtml, id} = product;
   const {shippingPolicy, refundPolicy, subscriptionPolicy} = shop;
@@ -228,22 +325,28 @@ export default function Product() {
           {/* Product Details */}
           <div className="w-full lg:w-[45%] pt-10 lg:pt-0 lg:pl-7 xl:pl-9 2xl:pl-10">
             <div className="sticky top-10 grid gap-7 2xl:gap-8">
+            {product.customizable_size?.value === "true" ? (
+              <Suspense fallback={<CustomProductForm product={product} facets={[]} productMetafields={[]} />}>
+                <Await resolve={facetsDataPromise}>
+                  {(data) => (
+                    <CustomProductForm 
+                      product={product}
+                      facets={data.facets}
+                      productMetafields={data.productMetafields}
+                    />
+                  )}
+                </Await>
+              </Suspense>
+            ) : (
               <Suspense fallback={<ProductForm variants={[]} />}>
                 <Await
                   errorElement="There was a problem loading related products"
                   resolve={variants}
                 >
-                  {(resp) => (
-                  <>
-                  {product.customizable_size?.value === "true" ? ( // 添加严格相等判断和字符串比较
-                    <CustomProductForm product={product}/>
-                  ) : (
-                    <ProductForm variants={resp.product?.variants.nodes || []} />
-                  )}
-                </>
-                  )}
+                  {(resp) => (<ProductForm variants={resp.product?.variants.nodes || []} />)}
                 </Await>
               </Suspense>
+            )}
 
               {/*  */}
               <hr className=" border-slate-200 dark:border-slate-700"></hr>
@@ -896,6 +999,35 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     }
   }
   ${COMMON_PRODUCT_CARD_FRAGMENT}
+` as const;
+
+export const Collection_Handle_QUERY = `#graphql
+  query collectionHandle(
+    $country: CountryCode
+    $language: LanguageCode
+    $handle: String!
+  ) @inContext(country: $country, language: $language){
+    product(handle: $handle) {
+      collections(first: 1) {
+        nodes {
+          handle
+        }
+        edges {
+          node {
+            products(first: 250) {
+              nodes {
+                metafields(identifiers: [{key: "opacity", namespace: "custom"},{key: "material", namespace: "custom"},{key: "color", namespace: "custom"},{key: "thickness", namespace: "custom"},{key: "diameter", namespace: "custom"}]) {
+                  key
+                  value
+                }
+                handle
+              }
+            }
+          }
+      }
+      }
+    }
+  }
 ` as const;
 
 async function getRecommendedProducts(
