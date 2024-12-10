@@ -20,6 +20,9 @@ declare global {
    * Declare expected Env parameter in fetch handler.
    */
   interface Env {
+    //我把ALGOLIA放在这里了
+    ALGOLIA_APP_ID: string;
+    ALGOLIA_API_KEY: string;
     //我把SHOPIFY_ADMIN_ACCESS_TOKEN放在这里了
     SHOPIFY_ADMIN_ACCESS_TOKEN: string;
     SESSION_SECRET: string;
