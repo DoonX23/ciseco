@@ -39,10 +39,6 @@ export default async function handleRequest(
       'ws ://localhost:*',
       'ws://127.0.0.1:*',
       'https://api.okendo.io',
-      // 添加 Algolia 相关域名
-      'https://*.algolia.net',
-      'https://*.algolianet.com',
-      'https://*.algolia.io'
     ],
   });
   const body = await renderToReadableStream(
