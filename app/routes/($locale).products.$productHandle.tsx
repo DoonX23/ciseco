@@ -161,11 +161,12 @@ function loadDeferredData(args: LoaderFunctionArgs) {
   const {params, request, context} = args;
   const {productHandle} = params;
   invariant(productHandle, 'Missing productHandle param, check route filename');
-
+/*
  const client = liteClient(context.env.ALGOLIA_APP_ID,context.env.ALGOLIA_API_KEY, {
     requester: createFetchRequester()  // 使用fetch requester
   }
 );
+*/
 
   // In order to show which variants are available in the UI, we need to query
   // all of them. But there might be a *lot*, so instead separate the variants
