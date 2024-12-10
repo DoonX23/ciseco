@@ -339,28 +339,7 @@ export default function Product() {
           {/* Product Details */}
           <div className="w-full lg:w-[45%] pt-10 lg:pt-0 lg:pl-7 xl:pl-9 2xl:pl-10">
             <div className="sticky top-10 grid gap-7 2xl:gap-8">
-            {product.customizable_size?.value === "true" ? (
-              <Suspense fallback={<CustomProductForm product={product} facets={[]} productMetafields={[]} />}>
-                <Await resolve={facetsDataPromise}>
-                  {(data) => (
-                    <CustomProductForm 
-                      product={product}
-                      facets={data.facets}
-                      productMetafields={data.productMetafields}
-                    />
-                  )}
-                </Await>
-              </Suspense>
-            ) : (
-              <Suspense fallback={<ProductForm variants={[]} />}>
-                <Await
-                  errorElement="There was a problem loading related products"
-                  resolve={variants}
-                >
-                  {(resp) => (<ProductForm variants={resp.product?.variants.nodes || []} />)}
-                </Await>
-              </Suspense>
-            )}
+            
 
               {/*  */}
               <hr className=" border-slate-200 dark:border-slate-700"></hr>
