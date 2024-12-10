@@ -145,7 +145,18 @@ async function loadCriticalData(args: LoaderFunctionArgs) {
     seo,
   };
 }
+// 首先定义相关接口
+interface Metafield {
+  key: string;
+  value: string;
+  // 其他可能的字段...
+}
 
+interface Product {
+  handle: string;
+  metafields: Metafield[];
+  // 其他可能的字段...
+}
 function loadDeferredData(args: LoaderFunctionArgs) {
   const {params, request, context} = args;
   const {productHandle} = params;
@@ -229,10 +240,10 @@ const facetsPromise = collectionDataPromise.then(async ({collectionHandle, produ
   // 获取facets中的名称（转为小写以便比较）
   const facetNames = transformedFacets.map(facet => facet.name.toLowerCase());
   // 过滤productMetafields
-  const filteredMetafields = productMetafields.map(product => ({
+  const filteredMetafields = productMetafields.map((product: Product) => ({
     metafields: product.metafields
-      .filter(metafield => metafield != null)
-      .filter(metafield => facetNames.includes(metafield.key)),
+      .filter((metafield: Metafield | null) => metafield != null)
+      .filter((metafield: Metafield) => facetNames.includes(metafield.key)),
     handle: product.handle
   }));
 
