@@ -188,6 +188,8 @@ function loadDeferredData(args: LoaderFunctionArgs) {
     handle: 'route-product',
   });
 
+    // 注释掉复杂的查询逻辑
+  /*
   // 修改: 将collection查询结果存储为Promise
   const collectionQueryPromise = context.storefront.query(Collection_Handle_QUERY, {
     variables: {
@@ -252,15 +254,15 @@ const facetsPromise = collectionDataPromise.then(async ({collectionHandle, produ
     filteredMetafields
   };
 });
-
+  */
 return {
   variants,
   routePromise,
-  // 只返回一个包含两个数据的Promise
-  facetsDataPromise: facetsPromise.then(result => ({
-    facets: result.facets,
-    productMetafields: result.filteredMetafields
-  }))
+  // 提供一个固定的模拟数据
+  facetsDataPromise: Promise.resolve({
+    facets: [], // 空数组
+    productMetafields: [] // 空数组
+  })
 };
 }
 
