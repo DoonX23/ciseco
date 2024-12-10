@@ -260,10 +260,6 @@ return {
   variants,
   routePromise,
   // 提供一个固定的模拟数据
-  facetsDataPromise: Promise.resolve({
-    facets: [], // 空数组
-    productMetafields: [] // 空数组
-  })
 };
 }
 
@@ -311,7 +307,7 @@ export const meta = ({matches}: MetaArgs<typeof loader>) => {
 };
 
 export default function Product() {
-  const {product, shop, recommended, variants, routePromise, facetsDataPromise } =
+  const {product, shop, recommended, variants, routePromise } =
     useLoaderData<typeof loader>();
   const {media, outstanding_features, descriptionHtml, id} = product;
   const {shippingPolicy, refundPolicy, subscriptionPolicy} = shop;
